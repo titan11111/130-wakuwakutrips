@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="出張プログラム">
+    <title>出張プログラム視認化ツール 🎮</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- スタート画面（出張する？＝BGM開始トリガー） -->
+    <div id="startScreen" class="start-screen">
+        <div class="start-screen-inner">
+            <h1 class="start-title">🗺️ 出張プログラム<br>視認化ツール</h1>
+            <p class="start-subtitle">1ヶ月の出張をゲーム感覚で計画</p>
+            <button type="button" id="startBtn" class="start-btn">出張する？</button>
+        </div>
+    </div>
+
+    <div id="mainScreen" class="container" style="display: none;">
+        <header class="header">
+            <div class="header-sounds">
+                <button type="button" id="workModeBtn" class="work-mode-btn" title="作業中は音を出さない">🔔</button>
+                <button type="button" id="muteBtn" class="mute-btn" title="効果音のオン/オフ">🔊</button>
+            </div>
+            <h1 class="title">🗺️ 出張プログラム視認化ツール</h1>
+            <p class="subtitle">1ヶ月の出張をゲーム感覚で計画</p>
+        </header>
+
+        <main class="main">
+            <section class="calendar-section">
+                <div class="section-header">
+                    <h2>📅 カレンダー</h2>
+                    <div class="month-selector">
+                        <button id="prevMonthBtn" class="month-btn">◀</button>
+                        <span id="monthDisplay" class="month-display">2026年 4月</span>
+                        <button id="nextMonthBtn" class="month-btn">▶</button>
+                    </div>
+                </div>
+                <div class="calendar-container">
+                    <div class="weekdays">
+                        <div class="weekday">日</div>
+                        <div class="weekday">月</div>
+                        <div class="weekday">火</div>
+                        <div class="weekday">水</div>
+                        <div class="weekday">木</div>
+                        <div class="weekday">金</div>
+                        <div class="weekday">土</div>
+                    </div>
+                    <div id="calendarGrid" class="calendar-grid"></div>
+                </div>
+            </section>
+
+            <div class="main-right">
+            <div class="divider"></div>
+
+            <section class="tags-section">
+                <h2>🎯 出張地域を選ぶ</h2>
+                <div class="tags-container">
+                    <h3 class="tags-title">プリセット地域</h3>
+                    <div id="tagsPool" class="tags-pool"></div>
+                </div>
+                <div class="custom-region-container">
+                    <h3 class="tags-title">カスタム地域を追加</h3>
+                    <div class="input-group">
+                        <input type="text" id="customRegionInput" placeholder="地域名を入力（例：横浜、大阪）" class="custom-input">
+                        <button id="addRegionBtn" class="add-btn">➕ 追加</button>
+                    </div>
+                    <div id="customTagsPool" class="custom-tags-pool"></div>
+                </div>
+            </section>
+
+            <div class="divider"></div>
+
+            <section class="status-section">
+                <h2>📍 配置状態</h2>
+                <div class="status-container">
+                    <div class="placement-list">
+                        <h3>配置済み出張地</h3>
+                        <div id="placementList" class="placement-items">
+                            <p class="empty-state">まだ配置されていません</p>
+                        </div>
+                    </div>
+                    <div class="status-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">配置済み</span>
+                            <span id="placedCount" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">残り日数</span>
+                            <span id="remainingDays" class="stat-value">30</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="divider"></div>
+
+            <section class="action-section">
+                <button id="resetBtn" class="action-btn reset-btn">🔄 リセット</button>
+                <button id="undoBtn" class="action-btn undo-btn">↩️ アンドゥ</button>
+                <button id="pdfBtn" class="action-btn pdf-btn">📄 PDFで決定</button>
+            </section>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>💡 ゲーム感覚で出張計画を楽しもう！</p>
+        </footer>
+    </div>
+
+    <div id="toast" class="toast"></div>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>PDFを生成中...</p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
