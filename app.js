@@ -125,19 +125,8 @@ const Sound = {
         else BGM.resume();
     },
 
-    updateMuteButton() {
-        const btn = document.getElementById('muteBtn');
-        if (btn) btn.textContent = this.muted ? '🔇' : '🔊';
-    },
-
-    updateWorkModeButton() {
-        const btn = document.getElementById('workModeBtn');
-        if (btn) {
-            btn.textContent = this.workMode ? '🔕' : '🔔';
-            btn.title = this.workMode ? '作業モード（音なし）・タップで解除' : '作業中は音を出さない';
-            btn.classList.toggle('is-active', this.workMode);
-        }
-    }
+    updateMuteButton() {},
+    updateWorkModeButton() {}
 };
 
 // 効果音は「ボタンを押した時」と「カレンダーに置いた時」のみ
@@ -210,9 +199,91 @@ function init() {
     renderCalendar();
     renderTags();
     setupEventListeners();
+    setupBottomSheet();       // 旧ボトムシート：要素なければ即return（後方互換）
+    setupControlPanelTabs();  // 新コントロールパネルタブ
     setupReturnDropZone();
     setupIOSAudioResume();
     updateStats();
+}
+
+// ボトムシート：タップ/スワイプで展開・閉じる
+function setupBottomSheet() {
+    const sheet = document.getElementById('bottomSheet');
+    const handle = document.getElementById('bottomSheetHandle');
+    const content = document.getElementById('bottomSheetContent');
+    if (!sheet || !handle || !content) return;
+
+    function open() {
+        sheet.classList.add('is-expanded');
+        handle.setAttribute('aria-expanded', 'true');
+    }
+
+    function close() {
+        sheet.classList.remove('is-expanded');
+        handle.setAttribute('aria-expanded', 'false');
+    }
+
+    function toggle() {
+        sheet.classList.toggle('is-expanded');
+        const expanded = sheet.classList.contains('is-expanded');
+        handle.setAttribute('aria-expanded', String(expanded));
+    }
+
+    handle.addEventListener('click', () => {
+        playSE('click');
+        toggle();
+    });
+
+    const fab = document.getElementById('openSheetFab');
+    if (fab) {
+        fab.addEventListener('click', () => {
+            playSE('click');
+            open();
+        });
+    }
+
+    let touchStartY = 0;
+    handle.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    handle.addEventListener('touchend', (e) => {
+        if (!e.changedTouches.length) return;
+        const endY = e.changedTouches[0].clientY;
+        const dy = touchStartY - endY;
+        if (dy > 20) open();
+        else if (dy < -20) close();
+    }, { passive: true });
+}
+
+// ============================================
+// コントロールパネル タブ切り替え（モバイル用）
+// ============================================
+function setupControlPanelTabs() {
+    const tabs = document.querySelectorAll('.cp-tab');
+    if (!tabs.length) return;
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            playSE('click');
+
+            // すべてのタブ・ペインを非アクティブ化
+            tabs.forEach(t => {
+                t.classList.remove('active');
+                t.setAttribute('aria-selected', 'false');
+            });
+            document.querySelectorAll('.cp-pane').forEach(p => {
+                p.classList.remove('active');
+            });
+
+            // クリックされたタブとターゲットペインをアクティブ化
+            tab.classList.add('active');
+            tab.setAttribute('aria-selected', 'true');
+            const targetId = tab.dataset.target;
+            const targetPane = document.getElementById(targetId);
+            if (targetPane) targetPane.classList.add('active');
+        });
+    });
 }
 
 // ============================================
@@ -557,18 +628,6 @@ function setupEventListeners() {
     };
     document.addEventListener('click', onceInitSound);
     document.addEventListener('touchstart', onceInitSound);
-
-    document.getElementById('workModeBtn')?.addEventListener('click', () => {
-        Sound.init();
-        Sound.toggleWorkMode();
-        playSE('click');
-    });
-
-    document.getElementById('muteBtn')?.addEventListener('click', () => {
-        Sound.init();
-        playSE('click');
-        Sound.toggleMute();
-    });
 
     document.getElementById('addRegionBtn').addEventListener('click', () => {
         playSE('click');
